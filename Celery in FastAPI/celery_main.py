@@ -4,7 +4,7 @@ from celery import Celery
 # Celery configuration with RabbitMQ as the broker
 celery_app = Celery(
     "celery_main",
-    broker="amqp://guest:guest@localhost:5672//",  
+    broker="amqp://guest:mikki999@localhost:5672//",
     backend="rpc://"  
 )
 
