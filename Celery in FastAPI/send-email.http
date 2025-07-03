@@ -1,0 +1,2 @@
+### POST request to example server
+POST http://127.0.0.1:8000/send-email/?email=srmitin@yahoo.com&subject=Test%20Subject&body=Test%20Body

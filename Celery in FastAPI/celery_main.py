@@ -16,5 +16,5 @@ celery_app.conf.update(
 def send_email_task(email: str, subject: str, body: str):
     import time
     time.sleep(5)
-    print(f"Email sent to {email} with subject {subject}")
+    print(f"Email sent to {email} with subject {subject} and body {body}")
     return {"email": email, "subject": subject, "status": "sent"}

@@ -1,0 +1,21 @@
+[project]
+name = "fastapi-projects"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+
+]
+[project.optional-dependencies]
+test = ["pytest"]
+dev = [
+    "pytest",
+    "ruff>=0.9.10",
+    "black",
+    "mypy",
+    "trio",
+    "pytest-mock",
+    "httpx",
+    "pytest-asyncio",
+]

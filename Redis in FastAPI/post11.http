@@ -1,0 +1,9 @@
+### POST request to example server
+POST http://127.0.0.1:8000/get_details
+Content-Type: application/json
+
+{
+  "key": "value"
+}
+
+###
