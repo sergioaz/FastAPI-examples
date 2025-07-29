@@ -25,7 +25,7 @@ class ConnectionManager:
         self.save_message(message)
 
     def save_message(self, message: str):
-        with open("chat_history.txt", "a") as file:
+        with open("chat_history.txt", "a", encoding="utf-8") as file:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             file.write(f"[{timestamp}] {message}\n")
 

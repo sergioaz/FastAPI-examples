@@ -1,0 +1,16 @@
+### POST request to register user
+POST http://127.0.0.1:8000/auth/register
+Content-Type: application/json
+
+{
+  "username": "user1",
+  "password": "password123",
+  "email": "user1@gmail.com"
+}
+
+### POST request to receive JWT token
+POST http://127.0.0.1:8000/auth/token
+Content-Type: application/x-www-form-urlencoded
+
+username = user1 &
+password = password123

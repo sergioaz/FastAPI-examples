@@ -3,7 +3,9 @@ POST http://127.0.0.1:8000/get_details
 Content-Type: application/json
 
 {
-  "key": "value"
+  "key": "value2"
 }
 
-###
+### DELETE request to example server
+DELETE http://127.0.0.1:8000/delete_keys_with_suffix/app_cache
+Content-Type: application/json

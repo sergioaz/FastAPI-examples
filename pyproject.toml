@@ -19,3 +19,8 @@ dev = [
     "httpx",
     "pytest-asyncio",
 ]
+
+[tool.uv.workspace]
+members = [
+    "FastAPI-static",
+]
