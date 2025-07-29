@@ -38,3 +38,5 @@ async def delete_item(item_id: int, db: Session = Depends(get_db)):
     crud.delete_item(db, item_id)
     return {"message": "Item deleted"}
 
+if __name__ == "__main__":
+    uvicorn.run("main:app", port=8000, log_level="info")
