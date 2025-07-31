@@ -25,7 +25,7 @@ class DataBasePool:
             - await setup(MyClass, timeout=30)
         """
         cls._db_pool = await asyncpg.create_pool(
-            dsn="postgres://postgres:password@localhost:5433/postgres", 
+            dsn="postgres://postgres:mikki9@localhost:5432/postgres",
             min_size=10,
             max_size=30, 
             timeout=60

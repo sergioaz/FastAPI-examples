@@ -1,0 +1,8 @@
+### GET request to /with_pool
+GET http://127.0.0.1:8000/with_pool
+Content-Type: application/json
+
+
+### GET request to /without_pool
+POST http://127.0.0.1:8000/without_pool
+Content-Type: application/json

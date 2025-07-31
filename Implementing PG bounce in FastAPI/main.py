@@ -36,7 +36,7 @@ async def handle(db_pool:asyncpg.Pool = Depends(DataBasePool.get_pool)):
 
     async with db_pool.acquire() as connection:
         async with connection.transaction():
-            query = "SELECT * FROM employee_information limit 10"
+            query = "SELECT * FROM users limit 10"
             result = await execute_query_with_pool(query, fetch=True)
             return {"result": result}
 
@@ -51,6 +51,10 @@ async def without_pool():
     Example:
         - without_pool() -> {"result": 42}
     """
-    query = "SELECT COUNT(*) FROM employee_information"
+    query = "SELECT * FROM users limit 10"
     data = await execute_query(query, fetch_one=True)
     return {"result": data}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="localhost", port=8000)
