@@ -1,0 +1,53 @@
+### Address Search API Tests
+### Base URL: http://localhost:8000
+### 1. Root endpoint - API information
+
+### 4. Batch - profile only
+POST http://localhost:8000/batch
+Content-Type: application/json
+
+{
+  "operations": ["profile"]
+}
+
+###
+
+### 5. Batch - settings only
+POST http://localhost:8000/batch
+Content-Type: application/json
+
+{
+  "operations": ["settings"]
+}
+
+###
+
+### 6. Batch - suggestions only
+POST http://localhost:8000/batch
+Content-Type: application/json
+
+{
+  "operations": ["suggestions"]
+}
+
+###
+
+### 7. Batch - profile and settings
+POST http://localhost:8000/batch
+Content-Type: application/json
+
+{
+  "operations": ["profile", "settings"]
+}
+
+###
+
+### 8. Batch - profile, settings, suggestions
+POST http://localhost:8000/batch
+Content-Type: application/json
+
+{
+  "operations": ["notifications","profile", "settings", "suggestions"]
+}
+
+###

@@ -1,6 +1,61 @@
+import os
+from dotenv import load_dotenv
 import asyncpg
 from asyncpg import Pool
 from typing import Any, List, Optional
+
+# Load environment variables
+load_dotenv()
+
+# Database configuration from environment variables
+DB_CONFIG = {
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'port': os.getenv('DB_PORT', '5432'),
+    'database': os.getenv('DB_NAME', 'postgres'),
+    'user': os.getenv('DB_USER', 'postgres'),
+    'password': os.getenv('DB_PASSWORD', ''),
+    'pool_min_size': int(os.getenv("POOL_MIN_SIZE", 10)),
+    'pool_max_size': int(os.getenv("POOL_MAX_SIZE", 30)),
+    'pool_timeout': int(os.getenv("POOL_TIMEOUT", 60))
+}
+DB_CONFIG["dsn"] = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
+
+class DatabaseConnection:
+    _connection: Optional[asyncpg.Connection] = None
+    _timeout: Optional[float] = None
+
+    @classmethod
+    async def setup(cls, timeout: Optional[float] = None):
+        """
+        Asynchronously sets up a single database connection with optional timeout.
+        Parameters:
+            - timeout (Optional[float]): Optional timeout value for the database operations.
+        """
+        cls._connection = await asyncpg.connect(dsn=DB_CONFIG['dsn'], timeout=timeout)
+        cls._timeout = timeout
+
+    @classmethod
+    async def get_connection(cls) -> asyncpg.Connection:
+        """
+        Asynchronously retrieves the database connection.
+        Returns:
+            - asyncpg.Connection: The database connection if initialized.
+        """
+        if not cls._connection:
+            try:
+                await cls.setup(cls._timeout)
+            except Exception as e:
+                raise Exception(f"The database connection has not been properly initialized. Error {e}")
+        return cls._connection
+
+    @classmethod
+    async def teardown(cls):
+        """
+        Asynchronously closes the database connection.
+        """
+        if cls._connection:
+            await cls._connection.close()
+            cls._connection = None
 
 class UninitializedDatabasePoolError(Exception):
     def __init__(
@@ -25,10 +80,10 @@ class DataBasePool:
             - await setup(MyClass, timeout=30)
         """
         cls._db_pool = await asyncpg.create_pool(
-            dsn="postgres://postgres:mikki9@localhost:5432/postgres",
-            min_size=10,
-            max_size=30, 
-            timeout=60
+            dsn=DB_CONFIG['dsn'],
+            min_size=DB_CONFIG['pool_min_size'],
+            max_size=DB_CONFIG['pool_max_size'],
+            timeout=DB_CONFIG['pool_timeout']
             )
         cls._timeout = timeout
 
@@ -99,9 +154,7 @@ async def execute_query(query: str, *args: Any, fetch: bool = False, fetch_one: 
     Example:
         - execute_query("SELECT * FROM users WHERE id=$1", 1, fetch=True) -> [{'id': 1, 'name': 'John Doe'}]
     """
-    conn = await asyncpg.connect(
-        database="postgres", user="postgres", password="password", host="localhost", port=5433
-    )
+    conn = await DatabaseConnection.get_connection()
     try:
         if fetch:
             result = await conn.fetch(query, *args)
@@ -111,7 +164,5 @@ async def execute_query(query: str, *args: Any, fetch: bool = False, fetch_one: 
             result = await conn.execute(query, *args)
     except (asyncpg.PostgresError, ConnectionResetError) as e:
         print(f"Database error: {e}")
-    finally:
-        await conn.close()
 
     return result

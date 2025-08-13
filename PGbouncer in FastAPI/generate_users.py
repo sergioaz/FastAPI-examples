@@ -16,8 +16,8 @@ Environment variables (create a .env file):
 import os
 import sys
 from typing import List
-from sqlalchemy import create_engine, Column, Integer, String, MetaData, Table
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine, Column, Integer, String, MetaData, Table, text
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import IntegrityError
 from faker import Faker
@@ -63,12 +63,12 @@ def create_database_connection():
             pool_size=10,
             max_overflow=20,
             pool_pre_ping=True,
-            echo=False  # Set to True for SQL debugging
+            echo=True  # Set to True for SQL debugging
         )
         
         # Test connection
         with engine.connect() as conn:
-            conn.execute("SELECT 1")
+            conn.execute(text("SELECT 1"))
         
         print(f"✅ Connected to PostgreSQL database: {DB_CONFIG['database']}")
         return engine
