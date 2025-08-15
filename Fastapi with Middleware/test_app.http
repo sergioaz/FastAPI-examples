@@ -1,0 +1,33 @@
+### FastAPI Middleware Testing
+### Base URL: http://localhost:8000
+
+### 1. GET Request - Test basic middleware logging
+#GET http://localhost:8000/
+#Accept: application/json
+
+
+### 2. POST Request - Test middleware with JSON body and execution time logging
+POST http://localhost:8000/
+Content-Type: application/json
+Accept: application/json
+
+{
+  "message": "Testing middleware functionality",
+  "user_id": 123,
+  "action": "test_request",
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+
+
+
+### 4. POST Request - Minimal payload test
+POST http://localhost:8000/
+Content-Type: application/json
+Accept: application/json
+
+{
+  "test": "minimal"
+}
+
+###
+

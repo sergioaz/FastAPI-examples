@@ -1,30 +1,36 @@
-Middlewares: 
-https://medium.com/the-pythonworld/15-useful-middlewares-for-fastapi-that-you-should-know-about-8c2d67ea0d86
+# FastAPI Middleware Collection
 
-1. ----- Intercept requests / returns  ----------
-from fastapi import FastAPI, Request
-from starlette.middleware.base import BaseHTTPMiddleware
+A comprehensive collection of middleware examples for FastAPI applications, demonstrating various patterns to extend and enhance your API functionality.
 
-app = FastAPI()
+## Overview
 
+Middleware in FastAPI allows you to process requests and responses before they reach your route handlers or after they leave them. This collection showcases practical middleware implementations for common use cases such as:
+
+- Security enhancements
+- Performance optimization
+- Logging and monitoring
+- Authentication and authorization
+- Request/response manipulation
+
+## Middleware Examples
+
+### 1. Base Middleware Pattern
+
+[`fastapi_base_middleware_scratch_107.py`](./fastapi_base_middleware_scratch_107.py) - The fundamental pattern for creating custom middleware in FastAPI.
+
+```python
 class CustomHeaderMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # 🔹 Before request
+        # Before request processing
         print(f"Request URL: {request.url}")
         
-        # Call the next middleware or route
+        # Call the next middleware or route handler
         response = await call_next(request)
         
-        # 🔹 After response
+        # After response processing
         response.headers["X-Custom-Header"] = "MyValue"
         return response
-
-# Add middleware to app
-app.add_middleware(CustomHeaderMiddleware)
-
-@app.get("/")
-async def read_main():
-    return {"message": "Hello World"}
+```
 	
 2. ------ CORS - enabler (CORS (Cross-Origin Resource Sharing) is a mechanism that allows your frontend JavaScript app (on one domain) to securely interact with your FastAPI backend (on another domain))
 
@@ -331,3 +337,197 @@ async def startup():
 Automatically create and teardown a SQLAlchemy session per request — the cleanest way to manage database access in FastAPI.
 
 pip install sqlalchemy
+
+---
+
+## 🚩 Feature Flag Demo Application
+
+[`feature_flag_demo.py`](./feature_flag_demo.py) - A comprehensive FastAPI application demonstrating advanced feature flag patterns and middleware integration.
+
+### Overview
+
+The Feature Flag Demo showcases a production-ready feature flag system with multiple flag types, A/B testing capabilities, and comprehensive management APIs. This demo illustrates how feature flags can be used to:
+
+- 🔄 **Gradual Rollouts**: Release features to a percentage of users
+- 👥 **User Targeting**: Enable features for specific user groups
+- 🧪 **A/B Testing**: Run controlled experiments with multiple variants
+- 🚨 **Emergency Controls**: Instantly disable problematic features
+- 📊 **Analytics**: Track feature usage and performance metrics
+
+### Feature Flag Types Supported
+
+1. **Simple Flags** - Basic on/off toggles
+2. **Percentage Rollouts** - Gradual feature releases (0-100%)
+3. **User-specific Flags** - Allowlists and blocklists
+4. **A/B Testing** - Multi-variant experiments with control groups
+5. **Emergency Disable** - Instant kill switches for any flag
+
+### Key Components
+
+#### 1. FeatureFlagService Class
+```python
+class FeatureFlagService:
+    def is_enabled(self, flag_name: str, user_id: Optional[str] = None, context: Optional[Dict] = None) -> bool:
+        # Intelligent flag evaluation with user hashing
+        # Support for percentage rollouts and A/B testing
+        # Built-in analytics and usage tracking
+```
+
+#### 2. FeatureFlagMiddleware
+```python
+class FeatureFlagMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        # Inject feature flag service into request state
+        # Add user context from headers
+        # Include experiment group info in response headers
+```
+
+#### 3. Comprehensive API Endpoints
+
+**Admin Endpoints (Feature Flag Management):**
+- `POST /admin/feature-flags` - Create/update feature flags
+- `GET /admin/feature-flags` - List all feature flags
+- `GET /admin/feature-flags/{name}` - Get specific flag configuration
+- `DELETE /admin/feature-flags/{name}` - Remove feature flags
+- `POST /admin/feature-flags/{name}/emergency-disable` - Emergency kill switch
+- `GET /admin/feature-flags/{name}/stats` - Usage statistics
+
+**Demo Endpoints (Feature Testing):**
+- `GET /demo/simple-feature` - Simple on/off flag demo
+- `GET /demo/percentage-feature` - Percentage rollout demo
+- `GET /demo/user-feature` - User-specific targeting demo
+- `GET /demo/ab-test-feature` - A/B testing with variants
+- `POST /demo/payment` - Payment processor switching demo
+- `GET /demo/recommendations` - ML vs rule-based recommendations
+
+### Usage Examples
+
+#### 1. Creating a Simple Feature Flag
+```bash
+curl -X POST "http://localhost:8000/admin/feature-flags" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "new_dashboard",
+    "enabled": true,
+    "flag_type": "simple",
+    "description": "New dashboard UI"
+  }'
+```
+
+#### 2. Percentage-based Rollout
+```bash
+curl -X POST "http://localhost:8000/admin/feature-flags" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "beta_feature",
+    "enabled": true,
+    "flag_type": "percentage",
+    "percentage": 25,
+    "description": "Beta feature for 25% of users"
+  }'
+```
+
+#### 3. A/B Testing Setup
+```bash
+curl -X POST "http://localhost:8000/admin/feature-flags" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "checkout_experiment",
+    "enabled": true,
+    "flag_type": "ab_test",
+    "experiment_groups": {
+      "control": 33,
+      "variant_a": 33,
+      "variant_b": 34
+    },
+    "description": "Checkout flow A/B test"
+  }'
+```
+
+#### 4. Testing with User Headers
+```bash
+# Test percentage rollout
+curl -H "X-User-ID: user123" "http://localhost:8000/demo/percentage-feature"
+
+# Test A/B experiment
+curl -H "X-User-ID: test_user" "http://localhost:8000/demo/ab-test-feature"
+```
+
+### Advanced Features
+
+#### 1. Consistent User Hashing
+The system uses MD5 hashing to ensure users consistently see the same feature state across sessions:
+```python
+hash_input = f"{flag_name}:{user_id}"
+user_hash = int(hashlib.md5(hash_input.encode()).hexdigest(), 16) % 100
+return user_hash < percentage
+```
+
+#### 2. Real-time Analytics
+Built-in usage tracking for all feature flags:
+```python
+stats = {
+    "total_checks": 1547,
+    "enabled_count": 387,
+    "disabled_count": 1160,
+    "last_checked": "2024-01-15T14:30:00Z"
+}
+```
+
+#### 3. Emergency Controls
+Instant kill switches for problematic features:
+```python
+# Emergency disable any feature
+feature_service.emergency_disable("problematic_feature")
+```
+
+### Testing the Demo
+
+1. **Start the application:**
+```bash
+uvicorn feature_flag_demo:app --host 0.0.0.0 --port 8000 --reload
+```
+
+2. **Use the HTTP test file:**
+```bash
+# Use feature_flag_demo.http for comprehensive API testing
+# Contains 25+ test scenarios covering all feature types
+```
+
+3. **Monitor logs:**
+```bash
+# Watch real-time feature flag evaluations
+tail -f application.log
+```
+
+### Production Considerations
+
+- **Storage**: Replace in-memory storage with Redis/Database
+- **Authentication**: Add proper admin API authentication
+- **Caching**: Implement flag configuration caching
+- **Monitoring**: Integrate with monitoring systems (Prometheus/Grafana)
+- **Audit Logs**: Track all flag configuration changes
+- **Rollback**: Implement flag change history and rollback capabilities
+
+### HTTP Test File
+
+The [`feature_flag_demo.http`](./feature_flag_demo.http) file contains comprehensive test scenarios:
+
+- ✅ **26 Different Test Cases**
+- 🎯 **All Feature Flag Types Covered**
+- 👤 **Multiple User Scenarios**
+- 🚨 **Edge Case Testing**
+- 📊 **Statistics and Analytics Testing**
+- 🔧 **Admin Management Operations**
+
+### Demo Highlights
+
+- **Payment Processor Switching**: Safely rollout new payment systems
+- **ML vs Rule-based Recommendations**: A/B test recommendation engines
+- **User-specific Features**: VIP features for premium users
+- **Emergency Disable**: Instant rollback capabilities
+- **Comprehensive Analytics**: Track feature performance and adoption
+
+This feature flag system demonstrates enterprise-grade patterns suitable for production applications requiring controlled feature rollouts, A/B testing, and risk mitigation.
+
+---

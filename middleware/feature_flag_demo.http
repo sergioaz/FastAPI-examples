@@ -1,0 +1,280 @@
+### FastAPI Feature Flag Demo API Testing
+### Base URL: http://localhost:8000
+
+# =============================================================================
+# BASIC API INFORMATION
+# =============================================================================
+
+### 1. GET Root - API Information
+GET http://localhost:8000/
+Accept: application/json
+
+###
+
+# =============================================================================
+# FEATURE FLAG MANAGEMENT (ADMIN ENDPOINTS)
+# =============================================================================
+
+### 2. POST Create Simple Feature Flag
+POST http://localhost:8000/admin/feature-flags
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "test_simple_flag",
+  "enabled": true,
+  "flag_type": "simple",
+  "description": "Test simple on/off feature flag"
+}
+
+###
+
+### 3. POST Create Percentage-based Feature Flag
+POST http://localhost:8000/admin/feature-flags
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "test_percentage_flag",
+  "enabled": true,
+  "flag_type": "percentage",
+  "percentage": 30,
+  "description": "Test percentage rollout - 30% of users"
+}
+
+###
+
+### 4. POST Create User-specific Feature Flag
+POST http://localhost:8000/admin/feature-flags
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "test_user_flag",
+  "enabled": true,
+  "flag_type": "user_list",
+  "allowed_users": ["admin", "test_user", "premium_user"],
+  "blocked_users": ["blocked_user"],
+  "description": "Test user-specific feature flag"
+}
+
+###
+
+### 5. POST Create A/B Test Feature Flag
+POST http://localhost:8000/admin/feature-flags
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "test_ab_flag",
+  "enabled": true,
+  "flag_type": "ab_test",
+  "experiment_groups": {
+    "control": 40,
+    "variant_a": 30,
+    "variant_b": 30
+  },
+  "description": "Test A/B testing feature flag"
+}
+
+###
+
+### 6. POST Emergency Disable Feature Flag
+POST http://localhost:8000/admin/feature-flags/test_simple_flag/emergency-disable
+Content-Type: application/json
+Accept: application/json
+
+###
+
+### 7. GET List All Feature Flags
+GET http://localhost:8000/admin/feature-flags
+Accept: application/json
+
+###
+
+### 8. GET Specific Feature Flag
+GET http://localhost:8000/admin/feature-flags/test_simple_flag
+Accept: application/json
+
+###
+
+### 9. GET Feature Flag Statistics
+GET http://localhost:8000/admin/feature-flags/test_simple_flag/stats
+Accept: application/json
+
+###
+
+### 10. GET All Statistics
+GET http://localhost:8000/admin/stats
+Accept: application/json
+
+###
+
+### 11. DELETE Feature Flag
+DELETE http://localhost:8000/admin/feature-flags/test_simple_flag
+Accept: application/json
+
+###
+
+# =============================================================================
+# DEMO ENDPOINTS - TESTING FEATURE FLAGS IN ACTION
+# =============================================================================
+
+### 12. GET Simple Feature Demo (No User ID)
+GET http://localhost:8000/demo/simple-feature
+Accept: application/json
+
+###
+
+### 13. GET Simple Feature Demo (With User ID)
+GET http://localhost:8000/demo/simple-feature
+Accept: application/json
+X-User-ID: test_user
+
+###
+
+### 14. GET Percentage Feature Demo
+GET http://localhost:8000/demo/percentage-feature
+Accept: application/json
+X-User-ID: user_123
+
+###
+
+### 15. GET User Specific Feature Demo (Allowed User)
+GET http://localhost:8000/demo/user-feature
+Accept: application/json
+X-User-ID: admin
+
+###
+
+### 16. GET User Specific Feature Demo (Not Allowed User)
+GET http://localhost:8000/demo/user-feature
+Accept: application/json
+X-User-ID: regular_user
+
+###
+
+### 17. GET A/B Test Feature Demo
+GET http://localhost:8000/demo/ab-test-feature
+Accept: application/json
+X-User-ID: test_user_ab
+
+###
+
+### 18. POST Payment Demo (Legacy Processor)
+POST http://localhost:8000/demo/payment
+Content-Type: application/json
+Accept: application/json
+X-User-ID: legacy_user
+
+{
+  "amount": 99.99,
+  "currency": "USD",
+  "payment_method": "credit_card",
+  "card_number": "**** **** **** 1234"
+}
+
+###
+
+### 19. POST Payment Demo (New Processor)
+POST http://localhost:8000/demo/payment
+Content-Type: application/json
+Accept: application/json
+X-User-ID: premium_user
+
+{
+  "amount": 149.99,
+  "currency": "EUR",
+  "payment_method": "credit_card",
+  "card_number": "**** **** **** 5678",
+  "enable_fraud_detection": true
+}
+
+###
+
+### 20. GET ML Recommendations Demo
+GET http://localhost:8000/demo/recommendations
+Accept: application/json
+X-User-ID: ml_user
+
+###
+
+### 21. GET Recommendations Demo (Different User)
+GET http://localhost:8000/demo/recommendations
+Accept: application/json
+X-User-ID: basic_user
+
+###
+
+# =============================================================================
+# BULK TESTING WITH DIFFERENT USERS
+# =============================================================================
+
+### 22. Test Multiple Users for Percentage Rollout
+GET http://localhost:8000/demo/percentage-feature
+Accept: application/json
+X-User-ID: user_001
+
+###
+
+GET http://localhost:8000/demo/percentage-feature
+Accept: application/json
+X-User-ID: user_002
+
+###
+
+GET http://localhost:8000/demo/percentage-feature
+Accept: application/json
+X-User-ID: user_003
+
+###
+
+### 23. Test A/B Experiment with Multiple Users
+GET http://localhost:8000/demo/ab-test-feature
+Accept: application/json
+X-User-ID: experiment_user_1
+
+###
+
+GET http://localhost:8000/demo/ab-test-feature
+Accept: application/json
+X-User-ID: experiment_user_2
+
+###
+
+GET http://localhost:8000/demo/ab-test-feature
+Accept: application/json
+X-User-ID: experiment_user_3
+
+###
+
+# =============================================================================
+# EDGE CASE TESTING
+# =============================================================================
+
+### 24. Test Missing User ID (Should Return 400)
+GET http://localhost:8000/demo/percentage-feature
+Accept: application/json
+
+###
+
+### 25. Test Non-existent Feature Flag
+GET http://localhost:8000/admin/feature-flags/non_existent_flag
+Accept: application/json
+
+###
+
+### 26. POST Create Duplicate Feature Flag (Update)
+POST http://localhost:8000/admin/feature-flags
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "simple_demo_feature",
+  "enabled": false,
+  "flag_type": "simple",
+  "description": "Updated simple demo feature flag"
+}
+
+###
+

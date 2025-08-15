@@ -41,3 +41,23 @@ from fastapi import FastAPI
 
 app = FastAPI()
 app.add_middleware(HelmetMiddleware)
+
+from fastapi import Request, HTTPException
+from fastapi.responses import HTMLResponse
+
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    return "<h1>Helmet Middleware Demo</h1><p>This is a secure FastAPI app.</p>"
+
+def main():
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="localhost",
+        port=8000,
+        reload=True,
+        log_level="info"
+    )
+
+if __name__ == "__main__":
+    main()
