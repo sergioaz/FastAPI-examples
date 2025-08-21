@@ -33,6 +33,19 @@ limiter2 = Limiter(key_func=get_user_key)
 async def read_items(request: Request):
     return {"msg": "Success"}
 
+# version 3 : Use Redis for distributed system rate limiting
+
+import redis
+from slowapi.extension import Limiter as Limiter3
+
+redis_client = redis.Redis(host='localhost', port=6379)
+limiter3 = Limiter3(key_func=get_remote_address, storage_uri="redis://localhost:6379")
+
+
+@app.get("/items3")
+@limiter3.limit("5/minute")
+async def read_items(request: Request):
+    return {"msg": "Success"}
 
 def main():
     import uvicorn

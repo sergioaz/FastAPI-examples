@@ -1,0 +1,18 @@
+### Redis Rate Limiting Tests
+GET http://localhost:8000/items3
+###
+
+GET http://localhost:8000/items3
+###
+
+GET http://localhost:8000/items3
+###
+
+GET http://localhost:8000/items3
+###
+
+GET http://localhost:8000/items3
+###
+
+GET http://localhost:8000/items3
+###

@@ -1,0 +1,8 @@
+### Address Search API Tests
+### Base URL: http://localhost:8000
+### 1. Root endpoint - API information
+
+### 4. Batch - profile only
+GET http://localhost:8000/items
+X-Tenant: acme
+###
