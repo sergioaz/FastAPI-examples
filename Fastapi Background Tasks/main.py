@@ -1,8 +1,10 @@
 from fastapi import FastAPI, BackgroundTasks, UploadFile, File
 import shutil
 import os
+from fastapi.responses import ORJSONResponse
 
-app = FastAPI()
+app = FastAPI(default_response_class=ORJSONResponse)
+
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
