@@ -32,8 +32,11 @@ class CustomHeaderMiddleware(BaseHTTPMiddleware):
         return response
 ```
 	
-2. ------ CORS - enabler (CORS (Cross-Origin Resource Sharing) is a mechanism that allows your frontend JavaScript app (on one domain) to securely interact with your FastAPI backend (on another domain))
+### 2. CORS Middleware
 
+Enables secure cross-origin requests from your frontend (on one domain) to your FastAPI backend (on another domain).
+
+```python
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -52,22 +55,28 @@ app.add_middleware(
     allow_credentials=True,            # allow cookies, headers, sessions
     allow_methods=["*"],               # allow all HTTP methods
     allow_headers=["*"],               # allow all headers
-)	
-	
-3. ---------- GZipMiddleware ---------
+)
+```
 
+### 3. GZip Compression Middleware
+
+Automatically compresses responses to reduce bandwidth and improve loading times for your API responses.
+
+```python
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
 
 app = FastAPI()
 
 # Add GZip middleware
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(GZipMiddleware, minimum_size=1000)  # Only compress responses > 1KB
+```
 
-4. ========== TrustedHostMiddleware-----------
-Use this middleware to protect your FastAPI app against Host header attacks, like DNS rebinding.
-It allows you to whitelist the domains your app should respond to. If a request comes in with an unknown Host header — it gets rejected with a 400 Bad Request.
+### 4. Trusted Host Middleware
 
+Protects your FastAPI app against Host header attacks (like DNS rebinding) by whitelisting allowed domains. Rejects requests with unknown Host headers with 400 Bad Request.
+
+```python
 from fastapi import FastAPI
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
@@ -82,10 +91,12 @@ app.add_middleware(
         "127.0.0.1"              # also valid for dev
     ]
 )
+```
 
-5. ------------ Request Logging Middleware -----------
+### 5. Request Logging Middleware
 Logs every incoming HTTP request and outgoing response, helping you trace errors, analyze traffic, and monitor system behavior in real time.
 
+```python
 from fastapi import FastAPI, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 import time
@@ -119,10 +130,12 @@ app.add_middleware(LoggingMiddleware)
 @app.get("/hello")
 async def hello():
     return {"message": "Hello, world!"}
-	
-6. ============ SlowAPI (Rate Limiting) -------------
+```
+
+## 6. SlowAPI (Rate Limiting) 
 Use SlowAPI to prevent abuse, brute-force attacks, and API overuse by limiting how often a client (usually by IP) can hit your endpoints.	
 
+```python
 uv pip install slowapi
 
 from fastapi import FastAPI, Request
@@ -143,15 +156,22 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 @limiter.limit("5/minute")
 async def limited_endpoint(request: Request):
     return {"message": "This is a rate-limited endpoint"}
-	
+```
 curl http://localhost:8000/limited
 
 6th time: 
 429 Too Many Requests
+```json
+{
+    "detail": "Rate limit exceeded. Limit: 5/minute"
+}
+```
 
-7. ------------ Session Middleware (Starlette) -----------
+## 7. Session Middleware (Starlette) 
 SessionMiddleware allows you to store user-specific data on the server (like login state, user preferences, or cart items) while tracking users via signed cookies.	
 
+```uv pip install starlette```
+```python
 from fastapi import FastAPI, Request
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -174,8 +194,10 @@ async def set_session(request: Request):
 async def get_session(request: Request):
     username = request.session.get("username", "Guest")
     return {"username": username}
-	
+```
+
 ======== Example Use Case: Login System ========
+```python
 @app.post("/login")
 async def login(request: Request):
     # Assume user is authenticated
@@ -188,9 +210,9 @@ async def get_current_user(request: Request):
     if not user_id:
         return {"message": "Not logged in"}
     return {"user_id": user_id}	
+```
 
-
-8. =========== CORSMiddleware + Custom Preflight Caching============
+## 8. CORSMiddleware + Custom Preflight Caching
 Improve frontend performance by caching CORS preflight responses using custom headers — reducing unnecessary network calls.
 
 Whenever a browser makes a cross-origin request with:
@@ -210,6 +232,7 @@ Tell the browser:
 “Hey, this preflight result is valid for a while — no need to ask again.”
 
 We do this by setting the Access-Control-Max-Age header.
+```python
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -237,6 +260,7 @@ class PreflightCacheMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
 app.add_middleware(PreflightCacheMiddleware)
+```
 
 Test With curl
 curl -X OPTIONS http://localhost:8000/api \
@@ -248,18 +272,21 @@ You should see:
 Access-Control-Allow-Origin: http://localhost:3000
 Access-Control-Max-Age: 600
 
-9. ------------- Sentry Middleware (Error Monitoring) ------------
+## 9. Sentry Middleware (Error Monitoring) 
 Catch exceptions, monitor performance, and get notified instantly when your FastAPI app crashes — using Sentry.
 
 https://home-office-inc.sentry.io/
 
+```
 uv pip install --upgrade sentry-sdk
+```
 
+```python
 from fastapi import FastAPI
 import sentry_sdk
 
 sentry_sdk.init(
-    dsn="https://4e1dcbf812bb2156351a04054f3bb0bb@o4509600462667776.ingest.us.sentry.io/4509600464961536",
+    dsn="https://xxxxxx.ingest.us.sentry.io/xxxxxx",  # Replace with your Sentry DSN
     # Add data like request headers and IP for users,
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,
@@ -270,9 +297,9 @@ app = FastAPI()
 @app.get("/sentry-debug")
 async def trigger_error():
     division_by_zero = 1 / 0
+```
 	
-	
-10. ---------- Prometheus Middleware (Metrics) ----------
+## 10. Prometheus Middleware (Metrics)
 Expose rich metrics from your FastAPI app — like request counts, error rates, and latency — using Prometheus and visualize them using tools like Grafana.
 How many requests is my app serving per second?
 Which endpoints are slow?
@@ -285,8 +312,11 @@ Trigger alerts on anomalies
 Monitor performance trends
 Ensure SLAs are met
 
+```bash
 uv pip install prometheus-fastapi-instrumentator
+```
 
+```python
 from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
 
@@ -298,12 +328,14 @@ instrumentator = Instrumentator().instrument(app).expose(app)
 @app.get("/ping")
 async def ping():
     return {"message": "pong"}
+```
 
 That’s it! Your metrics are now being tracked and exposed at:
 
 GET /metrics
 
-# customize:
+Customize:
+```python
 from prometheus_fastapi_instrumentator import Instrumentator
 
 instrumentator = Instrumentator(
@@ -314,13 +346,17 @@ instrumentator = Instrumentator(
 )
 
 instrumentator.instrument(app).expose(app, include_in_schema=False)	
+```
 
----
-11. ---------- Cache Middleware ----------
+
+## 11. Cache Middleware
 Use caching to reduce redundant processing and database queries — speeding up your FastAPI endpoints dramatically.
 
+```bash
 uv pip install fastapi-cache2[redis]
+```
 
+```python
 from fastapi import FastAPI
 from fastapi_cache2 import FastAPICache
 from fastapi_cache2.backends.redis import RedisBackend
@@ -328,17 +364,103 @@ import redis.asyncio as redis
 
 app = FastAPI()
 
-@app.on_event("startup")
-async def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize FastAPI Cache with Redis backend
     r = redis.Redis(host="localhost", port=6379, decode_responses=True)
     FastAPICache.init(RedisBackend(r), prefix="fastapi-cache")
 
-# 12. SQLAlchemy Session Middleware
+    yield
+```
+
+### 12. SQLAlchemy Session Middleware
+
 Automatically create and teardown a SQLAlchemy session per request — the cleanest way to manage database access in FastAPI.
 
-pip install sqlalchemy
+```bash
+pip install sqlalchemy psycopg2-binary  # For PostgreSQL
+# or
+pip install sqlalchemy pymysql         # For MySQL
+```
 
----
+```python
+from fastapi import FastAPI, Request, Depends
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+from starlette.middleware.base import BaseHTTPMiddleware
+
+# Database setup
+DATABASE_URL = "postgresql://user:password@localhost/dbname"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    email = Column(String, unique=True, index=True)
+
+app = FastAPI()
+
+# Session Middleware
+class DatabaseMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        request.state.db = SessionLocal()
+        try:
+            response = await call_next(request)
+        finally:
+            request.state.db.close()
+        return response
+
+app.add_middleware(DatabaseMiddleware)
+
+# Dependency to get database session
+def get_db(request: Request) -> Session:
+    return request.state.db
+
+# Route using the session
+@app.get("/users/{user_id}")
+async def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    return user
+
+@app.post("/users/")
+async def create_user(name: str, email: str, db: Session = Depends(get_db)):
+    user = User(name=name, email=email)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+```
+
+**Alternative: Using FastAPI's built-in dependency system (recommended):**
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# Or with async context manager
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def get_async_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+```
+pip install sqlalchemy
+```
+
 
 ## 🚩 Feature Flag Demo Application
 

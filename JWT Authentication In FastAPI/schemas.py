@@ -7,7 +7,7 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     username: str
-    email: str
+    email: EmailStr
 
 class Token(BaseModel):
     access_token: str

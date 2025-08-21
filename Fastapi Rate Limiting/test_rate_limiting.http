@@ -1,0 +1,40 @@
+### Address Search API Tests
+### Base URL: http://localhost:8000
+### 1. Root endpoint - API information
+
+### 4. Batch - profile only
+GET http://localhost:8000/items
+###
+
+GET http://localhost:8000/items
+###
+
+GET http://localhost:8000/items
+###
+
+GET http://localhost:8000/items
+###
+
+GET http://localhost:8000/items
+###
+
+GET http://localhost:8000/items
+
+
+### 4. Batch - profile only
+GET http://localhost:8000/items2
+###
+
+GET http://localhost:8000/items2
+###
+
+GET http://localhost:8000/items2
+###
+
+GET http://localhost:8000/items2
+###
+
+GET http://localhost:8000/items2
+###
+
+GET http://localhost:8000/items2

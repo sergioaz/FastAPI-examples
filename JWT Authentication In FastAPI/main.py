@@ -12,3 +12,16 @@ app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 async def read_users_me(current_user: User = Depends(auth_handler.auth_wrapper)):
     return current_user
 
+
+def main():
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="localhost",
+        port=8000,
+        reload=True,
+        log_level="info"
+    )
+
+if __name__ == "__main__":
+    main()
