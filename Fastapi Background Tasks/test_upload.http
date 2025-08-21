@@ -1,0 +1,18 @@
+### Address Search API Tests
+### Base URL: http://localhost:8000
+### 1. Root endpoint - API information
+
+
+
+### Upload a file
+POST http://localhost:8000/upload
+Content-Type: multipart/form-data; boundary=WebKitFormBoundary7MA4YWxkTrZu0gW
+
+--WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="example.txt"
+Content-Type: text/plain
+
+This is a test file for upload.
+--WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
