@@ -458,7 +458,31 @@ async def get_async_db():
     finally:
         db.close()
 ```
-pip install sqlalchemy
+uv pip install sqlalchemy
+
+
+## 13. Timeout Middleware
+Prevent long-running requests from hanging your FastAPI application by enforcing timeouts on request processing.
+```python
+import asyncio
+from fastapi.responses import JSONResponse
+import asyncio
+
+app = FastAPI()
+
+
+@app.middleware("http")
+async def timeout_middleware(request, call_next):
+    try:
+        return await asyncio.wait_for(call_next(request), timeout=5.0)
+    except asyncio.TimeoutError:
+        return JSONResponse(status_code=504, content={"message": "Request timed out"})
+
+
+@app.get("/timeout")
+async def read_items(request: Request):
+    await asyncio.sleep(10)
+    return {"msg": "Success"}
 ```
 
 
