@@ -1,0 +1,38 @@
+### FastAPI Feature Flag Demo API Testing
+### Base URL: http://localhost:8000
+
+# =============================================================================
+# BASIC API INFORMATION
+# =============================================================================
+
+### 1. GET Root - Default Language (Spanish)
+GET http://localhost:8000/greetings
+Accept: application/json
+Accept-Language: es-ES, fr-FR;q=0.8, en;q=0.7
+
+###
+
+### 2. GET Root - French Language
+GET http://localhost:8000/greetings
+Accept: application/json
+Accept-Language: fr-FR;q=0.8, en;q=0.7
+
+###
+
+### 3. GET Root - English Language
+GET http://localhost:8000/greetings
+Accept: application/json
+Accept-Language: en
+
+###
+
+### 4. GET Root - English Language
+GET http://localhost:8000/greetings
+Accept: application/json
+Accept-Language: en;q=0.7, es-ES, fr-FR;q=0.8
+
+### 5. GET Root - Most Preferred Language (Spanish)
+GET http://localhost:8000/greetings2
+Accept: application/json
+Accept-Language: en;q=0.7, es-ES, fr-FR;q=0.8
+
