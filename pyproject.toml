@@ -10,6 +10,8 @@ dependencies = [
     "fastapi>=0.95.2",
     "uvicorn[standard]>=0.22.0",
     "slowapi>=0.1.9",
+    "sqlalchemy>=2.0.43",
+    "httpx>=0.28.1",
 ]
 [project.optional-dependencies]
 test = ["pytest"]
@@ -23,6 +25,7 @@ dev = [
     "httpx",
     "pytest-asyncio",
     "radon>=6.0.1",
+    "pytest>=8.3.5",
 ]
 
 [tool.uv.workspace]
