@@ -267,13 +267,12 @@ Content-Type: application/json
   "updated_by": "tester"
 }
 
-### Test malformed order request
+### Test malformed order request - Missing required fields
 POST {{baseUrl}}/api/orders
 Content-Type: application/json
 
 {
   "user_id": "test"
-  // Missing required fields
 }
 
 ### Test order with negative amount
@@ -319,7 +318,7 @@ GET {{baseUrl}}/admin/error-stats
 # 1. Emergency disable critical features
 # 2. Check health (should show degraded)
 # 3. Try operations (should fail gracefully)
-# 4. Bulk re-enable features
+# 4. Bulk re-enable featureswhat's
 # 5. Verify recovery
 
 ### Test Sequence 4: Auto-Disable Simulation
