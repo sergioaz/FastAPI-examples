@@ -42,5 +42,7 @@ This collection of projects demonstrates the versatility and capabilities of Fas
 
 18. FastAPI Documentation: A comprehensive FastAPI project demonstrating advanced OpenAPI documentation customization and API documentation best practices. This project showcases how to enhance your API documentation with custom metadata, rich descriptions, endpoint grouping with tags, request/response examples, deprecated endpoint marking, and custom OpenAPI schema generation. It includes integration with modern documentation tools like Scalar for enhanced API documentation presentation, making your APIs more discoverable and developer-friendly.
 
+19. FastAPI and threads: Benchmark of 4 different approaches to long-running CPU-bound tasks ( Hint: none of 4 should be used in Prod! )
+
 ## Instructions
 Follow the project-specific instructions provided in the README.md file within each project directory.
