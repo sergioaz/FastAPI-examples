@@ -54,6 +54,18 @@ async def benchmark():
 
         print("-" * 20)
 
+        # background task
+        # Benchmark /background
+        print(f"Running {num_requests} requests to /background...")
+        start_time = time.time()
+        tasks_cycle_sleep = [client.get("/background") for _ in range(num_requests)]
+        await asyncio.gather(*tasks_cycle_sleep)
+        end_time = time.time()
+        duration_cycle_sleep = end_time - start_time
+        print(f"Batch of {num_requests} requests to /background took: {duration_cycle_sleep:.4f} seconds")
+
+        print("-" * 20)
+
     print("--- Benchmark finished ---")
 
 async def main():

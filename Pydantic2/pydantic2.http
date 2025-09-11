@@ -1,0 +1,24 @@
+@host=http://localhost:8000
+
+###
+GET http://localhost:8000/products/search/1
+
+
+###
+GET http://localhost:8000/products/search/?category=Elictronics&min_price=800&max_price=1000
+
+### Login submission
+POST {{host}}/login
+Content-Type: application/x-www-form-urlencoded
+
+username=admin&password=secretpassword
+
+### Query Filtering with Multiple Parameters
+# curl "http://localhost:8000/products/advanced-search?q=laptop&categories=Electronics&categories=Home%20Appliances&price_range=100-1000&sort_by=price_asc&page=2&items_per_page=10"
+GET {{host}}/products/advanced-search?q=laptop&categories=Electronics&categories=Home%20Appliances&
+    price_range=100-1000&sort_by=price_asc&page=1&items_per_page=10
+
+###
+
+### Check filtering of fields that are not required
+GET http://localhost:8000/users/1

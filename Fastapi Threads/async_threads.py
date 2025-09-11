@@ -1,10 +1,7 @@
-import time
-from fastapi import FastAPI, Request, Response
-from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi import FastAPI, Request, Response, BackgroundTasks
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-import httpx
-import uvicorn
+
 
 app = FastAPI(
     title="Async testing",
@@ -35,6 +32,7 @@ def long_running_cpu_task_sync():
     total = sum(i * i for i in range(10_000_000))
     return {"total": total}
 
+
 @app.get("/generator")
 async def generator():
     result = await long_running_cpu_task_async_generator()
@@ -50,13 +48,17 @@ async def cycle_sleep():
     result = await long_running_cpu_task_async_sleep()
     return {"data": result}
 
-
 executor = ThreadPoolExecutor()
 @app.get("/thread")
 async def thread():
     loop = asyncio.get_event_loop()
     result = await loop.run_in_executor(executor, long_running_cpu_task_sync)
     return {"result": result}
+
+@app.get("/background")
+async def register(background_tasks: BackgroundTasks):
+    background_tasks.add_task(long_running_cpu_task_sync)
+    return {"message": "long running task queued"}
 
 
 def main():
