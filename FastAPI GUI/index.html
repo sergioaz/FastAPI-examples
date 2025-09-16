@@ -1,0 +1,35 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Todos</title>
+<input id="title" placeholder="Add a task">
+<button id="add">Add</button>
+<ul id="list"></ul>
+<script>
+const API = "http://localhost:8000";
+const list = document.getElementById("list");
+const input = document.getElementById("title");
+
+async function refresh() {
+  const res = await fetch(API + "/todos");
+  const items = await res.json();
+  list.innerHTML = "";
+  for (const t of items) {
+    const li = document.createElement("li");
+    li.textContent = (t.done ? "✓ " : "") + t.title;
+    list.appendChild(li);
+  }
+}
+
+document.getElementById("add").onclick = async () => {
+  if (!input.value.trim()) return;
+  await fetch(API + "/todos", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ title: input.value })
+  });
+  input.value = "";
+  refresh();
+};
+
+refresh();
+</script>
