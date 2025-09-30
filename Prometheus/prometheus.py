@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import Counter
+import prometheus_client
 
 
 instrumentator = Instrumentator(
@@ -17,8 +19,15 @@ app = FastAPI()
 instrumentator = Instrumentator().instrument(app).expose(app)
 instrumentator.instrument(app).expose(app, include_in_schema=False)
 
+# Define a custom counter metric
+try:
+    my_counter = prometheus_client.REGISTRY._names_to_collectors['my_custom_counter']
+except KeyError:
+    my_counter = Counter("my_custom_counter", "Description of my custom counter")
+
 @app.get("/ping")
 async def ping():
+    my_counter.inc()
     return {"message": "pong"}
 
 def main():
@@ -28,7 +37,7 @@ def main():
         "prometheus:app",
         host="localhost",
         port=8000,
-        reload=True,
+        # reload=True,
         log_level="info"
     )
 
